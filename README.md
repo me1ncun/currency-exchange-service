@@ -1,6 +1,8 @@
 # currency-exchange-service
 Currency exchange service : REST API, ASP.NET Core, MySQL.Data, ConnectionPool, MySQL
 
+![Screenshot_20.jpg](assets/Screenshot_20.jpg)
+
 # Swagger documentation
 <a href="https://localhost:7234/swagger/index.html"> Social media API OpenAPI specification <a/>
 
