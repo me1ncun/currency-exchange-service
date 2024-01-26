@@ -57,20 +57,27 @@ public class ExchangeRatesController : ControllerBase
         }
     }
 
-    [HttpPost("/exchangeRates")]
-    public IActionResult Post( string baseCurrencyCode, string targetCurrencyCode, decimal rate)
+    public class ExchangePost
     {
-        var ex = exchangeService.PostExchangeRate(baseCurrencyCode, targetCurrencyCode, rate);
+        public string baseCurrencyCode { get; set; }
+        public string targetCurrencyCode { get; set; }
+        public decimal rate { get; set; }
+    }
+
+    [HttpPost("/exchangeRates")]
+    public IActionResult Post([FromBody] ExchangePost exchangePost)
+    {
+        var ex = exchangeService.PostExchangeRate(exchangePost.baseCurrencyCode, exchangePost.targetCurrencyCode, exchangePost.rate);
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.Append(baseCurrencyCode);
-        stringBuilder.Append(targetCurrencyCode);
+        stringBuilder.Append(exchangePost.baseCurrencyCode);
+        stringBuilder.Append(exchangePost.targetCurrencyCode);
         var allCurrencies = exchangeService.GetAllExchanges();
 
         if (allCurrencies != null)
         {
             return new JsonResult(ex);
         }
-        else if(baseCurrencyCode == null || targetCurrencyCode == null || rate == null)
+        else if(exchangePost.baseCurrencyCode == null || exchangePost.targetCurrencyCode == null || exchangePost.rate == null)
         {
             return StatusCode(StatusCodes.Status400BadRequest);
         }
@@ -78,7 +85,7 @@ public class ExchangeRatesController : ControllerBase
         {
             return StatusCode(StatusCodes.Status409Conflict);
         }
-        else if (currencyService.GetCurrency(baseCurrencyCode) == null || currencyService.GetCurrency(targetCurrencyCode) == null)
+        else if (currencyService.GetCurrency(exchangePost.baseCurrencyCode) == null || currencyService.GetCurrency(exchangePost.targetCurrencyCode) == null)
         {
             return StatusCode(StatusCodes.Status404NotFound);
         }
@@ -89,7 +96,7 @@ public class ExchangeRatesController : ControllerBase
     }
 
     [HttpPatch("/exchangeRate/{CodePair}")]
-    public IActionResult PatchExchangeRate(decimal rate, string codePair)
+    public IActionResult PatchExchangeRate(string codePair,decimal rate)
     {
         var ex = exchangeService.UpdateExchangeRate(codePair, rate);
 
@@ -100,10 +107,6 @@ public class ExchangeRatesController : ControllerBase
         else if(rate == null || codePair == null)
         {
             return StatusCode(StatusCodes.Status400BadRequest);
-        }
-        else if (exchangeService.GetExchangeRateByCode(codePair) == null)
-        {
-            return StatusCode(StatusCodes.Status404NotFound);
         }
         else
         {

@@ -68,16 +68,23 @@
 
     requestCurrencies();
 
-    $("#add-currency").submit(function (e) {
-        e.preventDefault();
+    var Cur = {};
+    function AddCurrency() {
+
+        Cur.name = $("#add-currency-name").val();
+        Cur.sign = $("#add-currency-sign").val();
+        Cur.code = $("#add-currency-code").val();
 
         $.ajax({
             url: `${host}/currencies`,
             type: "POST",
-            data: $("#add-currency").serialize(),
+            contentType: "application/json;charset=utf-8",
+            data: JSON.stringify(Cur),
+            dataType: "json",
             success: function (data) {
                 requestCurrencies();
             },
+
             error: function (jqXHR, textStatus, errorThrown) {
                 const error = JSON.parse(jqXHR.responseText);
                 const toast = $('#api-error-toast');
@@ -86,9 +93,16 @@
                 toast.toast("show");
             }
         });
+    }
 
-        return false;
-    });
+    $(document).ready(function () {
+        $("#btnSave").click(function (e) {
+
+            AddCurrency();
+            e.preventDefault();
+            console.log(Cur)
+        });
+    }); 
 
     function requestExchangeRates() {
         $.ajax({
@@ -147,7 +161,7 @@
         $.ajax({
             url: `${host}/exchangeRate/${pair}`,
             type: "PATCH",
-            contentType: "application/x-www-form-urlencoded",
+            contentType: "application/json;charset=utf-8",
             data: `rate=${exchangeRate}`,
             success: function () {
 
@@ -165,16 +179,23 @@
         $('#edit-exchange-rate-modal').modal('hide');
     });
 
-    $("#add-exchange-rate").submit(function (e) {
-        e.preventDefault();
+    var ExchangeRate = {};
+    function AddExchangeRate() {
+
+        ExchangeRate.baseCurrencyCode = $("#new-rate-base-currency").val();
+        ExchangeRate.targetCurrencyCode = $("#new-rate-target-currency").val();
+        ExchangeRate.rate = $("#exchange-rate").val();
 
         $.ajax({
             url: `${host}/exchangeRates`,
             type: "POST",
-            data: $("#add-exchange-rate").serialize(),
+            contentType: "application/json;charset=utf-8",
+            data: JSON.stringify(ExchangeRate),
+            dataType: "json",
             success: function (data) {
                 requestExchangeRates();
             },
+
             error: function (jqXHR, textStatus, errorThrown) {
                 const error = JSON.parse(jqXHR.responseText);
                 const toast = $('#api-error-toast');
@@ -183,9 +204,15 @@
                 toast.toast("show");
             }
         });
+    }
 
-        return false;
-    });
+    $(document).ready(function () {
+        $("#btnSaveExchange").click(function (e) {
+            console.log(ExchangeRate)
+            AddExchangeRate();
+            e.preventDefault();
+        });
+    }); 
 
     $("#convert").submit(function (e) {
         e.preventDefault();

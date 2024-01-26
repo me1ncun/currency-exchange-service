@@ -56,21 +56,15 @@ public class CurrenciesController : ControllerBase
     }
 
     [HttpPost("/currencies")]
-    public IActionResult Post(string name, string code, string sign)
+    public IActionResult Post([FromBody]Currency currency)
     {
-        var addedCurrency = currenciesService.PostCurrency(name, code, sign);
-
-        var allCurrencies = currenciesService.GetAllCurrencies();
+        var addedCurrency = currenciesService.PostCurrency(currency.Name, currency.Code, currency.Sign);
 
         if (addedCurrency != null)
         {
             return new JsonResult(addedCurrency);
         }
-        else if (allCurrencies.Any(currency => currency.Code == code))
-        {
-            return StatusCode(StatusCodes.Status409Conflict);
-        }
-        else if(name == null || code == null || sign == null)
+        else if (currency.Code == null || currency.Name == null || currency.Sign == null)
         {
             return StatusCode(StatusCodes.Status400BadRequest);
         }
